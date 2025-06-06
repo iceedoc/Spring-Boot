@@ -7,65 +7,55 @@ import java.util.Objects;
 import java.util.UUID;
 
 public final class Article implements Searchable {
+    private final String articleTitle;
+    private final String contentOfArticle;
     private final UUID id;
-    private final String title;
-    private final String text;
 
-    public Article(UUID id, String title, String text) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID статьи не может быть null");
-        }
-        if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Название статьи не может быть пустым");
-        }
-        if (text == null || text.trim().isEmpty()) {
-            throw new IllegalArgumentException("Текст статьи не может быть пустым");
-        }
+    public Article(UUID id, String articleTitle, String contentOfArticle) {
+        this.articleTitle = articleTitle;
+        this.contentOfArticle = contentOfArticle;
         this.id = id;
-        this.title = title;
-        this.text = text;
+    }
+
+    public Article(String articleTitle, String contentOfArticle) {
+        this(UUID.randomUUID(), articleTitle, contentOfArticle);
+    }
+
+    @Override
+    public String toString() {
+        return articleTitle + " " + contentOfArticle;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        } else if (other == null || this.getClass() != other.getClass()) {
+            return false;
+        }
+        Article object = (Article) other;
+        return Objects.equals(contentOfArticle, object.contentOfArticle);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(contentOfArticle);
+    }
+
+    @JsonIgnore
+    @Override
+    public String getSearchTerm() {
+        return toString();
+    }
+
+    @JsonIgnore
+    @Override
+    public String getTypeOfContent() {
+        return "ARTICLE";
     }
 
     @Override
     public UUID getId() {
         return id;
-    }
-
-    @Override
-    @JsonIgnore
-    public String getSearchTerm() {
-        return title + " " + text;
-    }
-
-    @Override
-    @JsonIgnore
-    public String getContentType() {
-        return "ARTICLE";
-    }
-
-    @Override
-    public String getName() {
-        return title;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Article article)) return false;
-        return getId().equals(article.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId());
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s%n%s", title, text);
     }
 }

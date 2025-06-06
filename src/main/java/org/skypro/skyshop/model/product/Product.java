@@ -7,18 +7,20 @@ import java.util.Objects;
 import java.util.UUID;
 
 public abstract class Product implements Searchable {
+    private final String productName;
     private final UUID id;
-    private final String name;
 
-    public Product(UUID id, String name) {
-        if (id == null) {
-            throw new IllegalArgumentException("ID продукта не может быть null");
-        }
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Название продукта не может быть пустым");
-        }
+    public Product(UUID id, String productName) {
         this.id = id;
-        this.name = name;
+        if (productName == null || productName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Введите корректное название продукта, оно не может быть пустым или содержать пробелы.");
+        }
+        this.productName = productName;
+
+    }
+
+    public Product(String productName) {
+        this(UUID.randomUUID(), productName);
     }
 
     @Override
@@ -26,45 +28,46 @@ public abstract class Product implements Searchable {
         return id;
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    @JsonIgnore
-    public String getSearchTerm() {
-        return getName();
-    }
-
-    @Override
-    @JsonIgnore
-    public String getContentType() {
-        return "PRODUCT";
+    public String getProductName() {
+        return productName;
     }
 
     public abstract double getPrice();
 
+    public abstract String getFormattedPrice();
+
     public abstract boolean isSpecial();
 
+    @JsonIgnore
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Product product)) return false;
-        return getId().equals(product.getId());
+    public String getSearchTerm() {
+        return productName;
     }
 
+    @JsonIgnore
     @Override
-    public int hashCode() {
-        return Objects.hash(getId());
+    public String getTypeOfContent() {
+        return "PRODUCT";
     }
 
     @Override
     public String toString() {
-        return String.format("%s: %.2f руб.%s",
-                getName(),
-                getPrice(),
-                isSpecial() ? " [Специальное предложение]" : ""
-        );
+        return productName + " ";
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        } else if (other == null || this.getClass() != other.getClass()) {
+            return false;
+        }
+        Product object = (Product) other;
+        return Objects.equals(productName, object.productName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(productName);
     }
 }
