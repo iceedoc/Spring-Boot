@@ -5,9 +5,12 @@ import java.util.UUID;
 public interface Searchable {
     String getSearchTerm();
 
-    String getContentType();
-
-    String getName();
+    String getTypeOfContent();
 
     UUID getId();
+
+    default String getStringRepresentation() {
+        return "Наименование: " + getSearchTerm() + " - " + "тип: " + getTypeOfContent();
+
+    }
 }
