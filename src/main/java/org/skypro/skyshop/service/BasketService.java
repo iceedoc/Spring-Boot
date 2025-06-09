@@ -21,8 +21,10 @@ public class BasketService {
     }
 
     public void addProduct(UUID id) {
-        if (storageService.getProductById(id).isEmpty())
-            throw new IllegalArgumentException("Указанный товар отсутствует");
+        if (id == null) {
+            throw new IllegalArgumentException("UUID не может быть пустым");
+        }
+        Product product = storageService.getProductByIdOrThrow(id);
         productBasket.addProducts(id);
     }
 
@@ -31,8 +33,7 @@ public class BasketService {
                 .map(entry -> {
                     UUID id = entry.getKey();
                     int numberOfProducts = entry.getValue();
-                    Product product = storageService.getProductById(id)
-                            .orElseThrow(() -> new IllegalStateException("Товар отсутствует"));
+                    Product product = storageService.getProductByIdOrThrow(id);
                     return new BasketItem(product, numberOfProducts);
                 })
                 .toList();
